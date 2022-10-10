@@ -47,9 +47,9 @@ def get_product(proveedor, firstDayMonth, lastDayMonth):
     results['HORA'] = results['HORA'].str.replace('am','')
     results['HORA'] = results['HORA'].str.replace('pm', '')
     results['FECHA'] = pd.to_datetime(results['FECHA'] + '' + results['HORA'], format='%Y-%m-%d%H:%M')
-    AgGrid(results)
-    results = results.groupby([results['FECHA'], results['PRODUCTO']], as_index=False).sum()
     results = results.query('`FECHA` >= @firstDayMonth and `FECHA` <= @lastDayMonth')
+    results = results.groupby([results['FECHA'], results['PRODUCTO']], as_index=False).sum()
+    
     
     return results
     
