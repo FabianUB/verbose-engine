@@ -1,13 +1,12 @@
-altair
-calendar_view
-deta
-hydralit_components
-matplotlib
-numpy
-pandas
-Pillow
-plotly
-PyYAML
-regex
-streamlit
-streamlit_authenticator
+altair >= 4.2.0
+deta >= 1.1.0
+numerize >= 0.12
+numpy >= 1.22.4
+pandas >= 1.4.2
+plotly >= 5.8.0
+streamlit >= 1.10.0
+streamlit_authenticator >= 0.1.5
+statsmodels
+streamlit-aggrid
+openpyxl
+xlsxwriter
