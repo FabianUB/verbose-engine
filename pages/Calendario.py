@@ -42,10 +42,15 @@ def get_product(proveedor, firstDayMonth, lastDayMonth):
             while(fetch.last != None):
                 fetch = db.fetch({'PRODUCTO':x}, last=fetch.last)
                 results = results.append(fetch.items)
+    
     results['SISTEMA'] = results['HORA'].apply(lambda x: x[-2:])
-    #results['HORA'] = results['HORA'].apply(lambda x : x + datetime.timedelta(delta=12) if x.dt.hour > 12)
+    results['HORA'] = results['HORA'].astype(str)
     results['HORA'] = results['HORA'].str.replace('am','')
     results['HORA'] = results['HORA'].str.replace('pm', '')
+    results['HORA'] = pd.to_datetime(results['HORA'], format="%H:%M")
+    condition = (results['HORA'].dt.hour < 12) & (results['SISTEMA'] == 'pm')
+    results.loc[condition, 'HORA']  = results.loc[condition, 'HORA'] + datetime.timedelta(hours=12)
+    results['HORA'] = results['HORA'].apply(lambda x : x.strftime('%H:%M'))
     results['FECHA'] = pd.to_datetime(results['FECHA'] + '' + results['HORA'], format='%Y-%m-%d%H:%M')
     results = results.query('`FECHA` >= @firstDayMonth and `FECHA` <= @lastDayMonth')
     results = results.groupby([results['FECHA'], results['PRODUCTO']], as_index=False).sum()
@@ -84,10 +89,7 @@ if st.session_state["authentication_status"]:
     lastDayofMonth = datetime.date(year, month, calendar.monthrange(year, month)[1])
     results = get_product(st.session_state['name'], firstDayOfMonth, lastDayofMonth)
     columns = ['FECHA', 'PAX', 'COSTE INDIVIDUAL', 'COSTE TOTAL', 'PRODUCTO', 'HORA']
-    #results['FECHA'] = results.index
-    st.write(results)
     results['DIA'] = results['FECHA'].dt.dayofweek
-    #results.drop(columns='HORA',inplace=True,axis=1)
     cal = MplCalendar(year, month)
     for index, row in results.iterrows():
         fecha = row['FECHA'].day
