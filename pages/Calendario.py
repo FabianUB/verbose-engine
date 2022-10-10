@@ -1,5 +1,4 @@
 from matplotlib.pyplot import text, title
-from regex import P
 import streamlit as st
 import streamlit.components.v1 as components
 from streamlit.logger import get_logger
@@ -13,9 +12,6 @@ import calendar
 import streamlit as st
 import streamlit_authenticator as stauth
 from mplcal import MplCalendar
-from calendar_view.calendar import Calendar
-from calendar_view.core.event import EventStyles
-from calendar_view.core.config import CalendarConfig
 from deta import Deta
 from PIL import Image
 import unittest
