@@ -1,0 +1,13 @@
+altair==4.2.0
+calendar_view==2.1.0
+deta==1.1.0
+hydralit_components==1.0.10
+matplotlib==3.5.2
+numpy==1.22.4
+pandas==1.4.2
+Pillow==9.2.0
+plotly==5.8.0
+PyYAML==6.0
+regex==2021.7.6
+streamlit==1.12.2
+streamlit_authenticator==0.2.1

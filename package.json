@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "@toast-ui/calendar": "^2.1.3",
+    "fullcalendar": "^5.11.3"
+  },
+  "name": "web-proveedores",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
