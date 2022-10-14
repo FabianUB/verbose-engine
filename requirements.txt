@@ -10,6 +10,3 @@ statsmodels
 streamlit-aggrid
 openpyxl
 xlsxwriter
-hydralit_components
-matplotlib
-regex

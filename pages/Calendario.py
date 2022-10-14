@@ -2,6 +2,7 @@ from matplotlib.pyplot import text, title
 import streamlit as st
 import streamlit.components.v1 as components
 from streamlit.logger import get_logger
+from streamlit_option_menu import option_menu
 from fileinput import filename
 import pandas as pd
 from st_aggrid import AgGrid
@@ -16,7 +17,32 @@ from deta import Deta
 from PIL import Image
 import unittest
 import yaml
+from streamlit_extras.switch_page_button import switch_page
+from PIL import Image
 
+def intro():
+    st.markdown("""
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    """, unsafe_allow_html=True)
+    selected = option_menu(None, ["Inicio", "Calendario", "Finance"], 
+        icons=['house', 'calendar', 'clipboard-data'], 
+        menu_icon="cast", default_index=1, orientation="horizontal")
+    if selected == "Inicio":
+        switch_page("Inicio")
+    elif selected == "Calendario":
+        pass
+    elif selected == "Finance":
+        switch_page("Finance")
+    image = Image.open('banner.png')
+    st.image(image, use_column_width='always')
+    st.write("""
+    <style>
+    @import url('https://fonts.googleapis.com/css?family=Barlow Condensed' rel='stylesheet'');
+    html, body, [class*="css"]  {
+    font-family: 'Barlow Condensed';
+    }
+    </style>
+    """, unsafe_allow_html=True)
 def add_logo():
     st.sidebar.image("welogo.png", use_column_width=True)
 
@@ -59,8 +85,13 @@ def get_product(proveedor, firstDayMonth, lastDayMonth):
     return results
     
 
-
-
+st.set_page_config(
+        page_title="Calendario",
+        page_icon="👋",
+        initial_sidebar_state="collapsed",
+        layout="wide"
+)
+intro()
 with open('credentials.yaml') as file:
     add_logo()
     config = yaml.safe_load(file)
@@ -76,6 +107,7 @@ with open('credentials.yaml') as file:
     st.session_state["name"], st.session_state["authentication_status"], st.session_state["username"] = authenticator.login('Login', 'main')
 
 if st.session_state["authentication_status"]:
+
     st.write("# Calendario")
     
     st.set_option('deprecation.showPyplotGlobalUse', False)
