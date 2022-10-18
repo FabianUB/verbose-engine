@@ -7,6 +7,7 @@ import streamlit_authenticator as stauth
 from streamlit_extras.switch_page_button import switch_page
 import hydralit_components as hc
 import numpy as np
+import datetime
 from datetime import datetime
 from st_aggrid import AgGrid
 import pandas as pd
@@ -31,7 +32,7 @@ def intro():
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     """, unsafe_allow_html=True)
     selected = option_menu(None, ["Inicio", "Calendario", "Finance"], 
-        icons=['house', 'calendar', 'clipboard-data'], 
+        icons=['house', 'calendar', 'clipboard-data', 'box-arrow-in-left'], 
         menu_icon="cast", default_index=0, orientation="horizontal")
     if selected == "Inicio":
         pass
@@ -40,6 +41,7 @@ def intro():
         switch_page("Calendario")
     elif selected == "Finance":
         switch_page("Finance")
+
     image = Image.open('banner.png')
     st.image(image, use_column_width='always')
     st.write("""
@@ -84,8 +86,14 @@ def get_product(proveedor):
             fetch = db.fetch({'PRODUCTO':producto}, last=fetch.last)
             results = results.append(fetch.items)
     
+    results['SISTEMA'] = results['HORA'].apply(lambda x: x[-2:])
+    results['HORA'] = results['HORA'].astype(str)
     results['HORA'] = results['HORA'].str.replace('am','')
     results['HORA'] = results['HORA'].str.replace('pm', '')
+    results['HORA'] = pd.to_datetime(results['HORA'], format="%H:%M")
+    condition = (results['HORA'].dt.hour < 12) & (results['SISTEMA'] == 'pm')
+    results.loc[condition, 'HORA']  = results.loc[condition, 'HORA'] + datetime.timedelta(hours=12)
+    results['HORA'] = results['HORA'].apply(lambda x : x.strftime('%H:%M'))
     results['FECHA'] = pd.to_datetime(results['FECHA'] + '' + results['HORA'], format='%Y-%m-%d%H:%M')
     
     return results, productos
@@ -138,6 +146,8 @@ def showStats(df, productos):
     cols = st.columns(2)
     today = datetime.date.today()
     now = datetime.datetime.now()
+    earliest = df['FECHA'].min()
+    latest = df['FECHA'].max()
     currentMonth = today.month
     currentYear = today.year
     plazasCY = df[df['FECHA'].dt.year == currentYear]
@@ -148,7 +158,8 @@ def showStats(df, productos):
     cols[0].markdown(cardStats('FACTURACIÓN ANUAL', round(plazasCY, 2)), unsafe_allow_html=True)
     cols[1].markdown(cardStats('FACTURACIÓN MENSUAL', round(plazasCM, 2)), unsafe_allow_html=True)
     df = df.groupby(df['FECHA'].dt.month).sum()
-    df.index = ['Ene','Feb','Mar','Abr','May','Jun','Jul', 'Ago', 'Sep', 'Oct','Nov','Dec']
+    indexMap = {1:'Ene',2:'Feb',3:'Mar',4:'Abr',5:'May',6:'Jun',7:'Jul',8:'Ago',9:'Sep',10:'Oct',11:'Nov',12:'Dic'}
+    df = df.rename(indexMap)
     fig = px.bar(df, x=df.index, y='TOTAL BRUTO')
     st.plotly_chart(fig, use_container_width=True)
 
@@ -230,6 +241,7 @@ def add_logo():
 
 def run():
     intro()
+    
 
     with open('credentials.yaml') as file:
         config = yaml.safe_load(file)
@@ -252,6 +264,7 @@ def run():
     st.session_state["name"], st.session_state["authentication_status"], st.session_state["username"] = authenticator.login('Login', 'main')
 
     if st.session_state["authentication_status"]:
+        authenticator.logout('Logout', 'sidebar')
         df, productos = get_product(st.session_state['name'])
         
         showEvents(df, productos)

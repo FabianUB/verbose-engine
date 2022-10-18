@@ -20,19 +20,21 @@ import yaml
 from streamlit_extras.switch_page_button import switch_page
 from PIL import Image
 
-def intro():
+def intro(authenticator):
     st.markdown("""
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     """, unsafe_allow_html=True)
     selected = option_menu(None, ["Inicio", "Calendario", "Finance"], 
-        icons=['house', 'calendar', 'clipboard-data'], 
-        menu_icon="cast", default_index=1, orientation="horizontal")
+        icons=['house', 'calendar', 'clipboard-data', 'box-arrow-in-left'], 
+        menu_icon="cast", default_index=0, orientation="horizontal")
     if selected == "Inicio":
         switch_page("Inicio")
     elif selected == "Calendario":
         pass
     elif selected == "Finance":
         switch_page("Finance")
+
+        
     image = Image.open('banner.png')
     st.image(image, use_column_width='always')
     st.write("""
@@ -91,7 +93,7 @@ st.set_page_config(
         initial_sidebar_state="collapsed",
         layout="wide"
 )
-intro()
+
 with open('credentials.yaml') as file:
     add_logo()
     config = yaml.safe_load(file)
@@ -103,11 +105,11 @@ with open('credentials.yaml') as file:
         config['cookie']['expiry_days'],
         config['preauthorized']
     )
-
+    intro(authenticator)
     st.session_state["name"], st.session_state["authentication_status"], st.session_state["username"] = authenticator.login('Login', 'main')
 
 if st.session_state["authentication_status"]:
-
+    authenticator.logout('Logout', 'sidebar')
     st.write("# Calendario")
     
     st.set_option('deprecation.showPyplotGlobalUse', False)

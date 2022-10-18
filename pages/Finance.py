@@ -22,19 +22,21 @@ import yaml
 from streamlit_extras.switch_page_button import switch_page
 from PIL import Image
 
-def intro():
+def intro(authenticator):
     st.markdown("""
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     """, unsafe_allow_html=True)
     selected = option_menu(None, ["Inicio", "Calendario", "Finance"], 
-        icons=['house', 'calendar', 'clipboard-data'], 
-        menu_icon="cast", default_index=2, orientation="horizontal")
+        icons=['house', 'calendar', 'clipboard-data', 'box-arrow-in-left'], 
+        menu_icon="cast", default_index=0, orientation="horizontal")
     if selected == "Inicio":
         switch_page("Inicio")
     elif selected == "Calendario":
         switch_page("Calendario")
     elif selected == "Finance":
         pass
+
+
     image = Image.open('banner.png')
     st.image(image, use_column_width='always')
     st.write("""
@@ -61,8 +63,7 @@ def add_logo():
     st.sidebar.image("welogo.png", use_column_width=True)
 
 def run():
-    intro()
-
+    
     st.write("# Finance")
 
     with open('credentials.yaml') as file:
@@ -76,10 +77,12 @@ def run():
         config['preauthorized']
     )
 
+    intro(authenticator)
 
     st.session_state["name"], st.session_state["authentication_status"], st.session_state["username"] = authenticator.login('Login', 'main')
 
     if st.session_state["authentication_status"]:
+        authenticator.logout('Logout', 'sidebar')
         cols = st.columns(2)
         currentDate = datetime.date.today()
         firstDayOfMonth = datetime.date(currentDate.year, currentDate.month, 1)
